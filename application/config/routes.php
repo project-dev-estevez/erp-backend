@@ -54,3 +54,14 @@ $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 
 $route['api/auth/login'] = 'api/AuthenticationController/login';
+
+
+// ******************* ALMACEN ***************************** //
+//$route['almacen/activar-almacen']='almacen/activar_almacen'; // ***
+//$route['almacen/desactivar-almacen']='almacen/desactivar_almacen'; // ***
+$route['api/warehouse/activate-or-desactivate/(:any)'] = 'Api/WarehouseController/activate_or_desactivate/$1';
+
+// DETALLE DEL ALMACEN
+// $route['almacen/traspaso-brazo']='almacen/traspaso_brazo'; // ***
+$route['api/warehouse/transfer-arm']='Api/WarehouseController/transfer_arm';
+// ******************* ALMACEN ***************************** //
