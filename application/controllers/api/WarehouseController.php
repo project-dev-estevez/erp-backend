@@ -28,7 +28,7 @@ class WarehouseController extends RestController{
                            ->validate_activate_or_desactivate( $uid, $data );
         
         if($validation['error']){
-            $this->response($validation, RestController::HTTP_INTERNAL_ERROR);
+            $this->response($validation, RestController::HTTP_BAD_REQUEST);
         }
         //-----------VALIDATION-----------VALIDATION-----------
 
@@ -49,29 +49,6 @@ class WarehouseController extends RestController{
         $response = [
             'error'     => false,
             'message'   => 'Almacén activado correctamente.'
-        ];
-
-        $this->response($response, RestController::HTTP_OK);
-    }
-
-    public function transfer_arm_post(){
-        
-        $check = $this->warehouse_model->transfer_arm();
-
-        // No se pudo realizar el proceso
-        if(!$check){
-            $response = [
-                'error'     => true,
-                'message'   => 'Ocurrio un problema intente nuevamente.l3'
-            ];
-
-            $this->response($response, RestController::HTTP_INTERNAL_ERROR);
-        }
-
-        // Si se pudo realizar el proceso
-        $response = [
-            'error'     => false,
-            'message'   => 'Se aprobó correctamente'
         ];
 
         $this->response($response, RestController::HTTP_OK);
