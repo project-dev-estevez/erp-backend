@@ -361,10 +361,10 @@ $config['rest_limits_method'] = 'ROUTED_URL';
 | Length of the created keys. Check your default database schema on the
 | maximum length allowed
 |
-| Note: The maximum length is 40
+| Note: The maximum length is 60
 |
 */
-$config['rest_key_length'] = 40;
+$config['rest_key_length'] = 60;
 
 /*
 |--------------------------------------------------------------------------

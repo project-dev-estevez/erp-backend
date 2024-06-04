@@ -45,11 +45,21 @@ class AuthenticationController extends RestController
         //-----------[DB]VALIDATION PASSWORD-----------[DB]VALIDATION PASSWORD-----------
 
         // Si la contraseña es correcta.
-        log_message('info', "Inició Sesión!");
+        $user_data = $validation['user_data'];
+
+        // 1. generar un token y cifrarlo con PHP
+        $random_token = $this->login_model->generate_random_token();
+        // $token_hash = password_hash( $random_token, PASSWORD_DEFAULT ); --> Refinar Con Esto
+
+        // 2. en el modelo de login, crear función para cear registros en la tabla api_keys.
+        $is_logued = $this->login_model->login( $user_data->id, $random_token, 1 );
+
+        log_message('info', "[Estevez] " . $user_data->nombre . " - " . "Inició Sesión!");
         $response = [
             'status' => true,
-            'message' => 'Login exitoso',
-            'data' => $validation['user_data']
+            'message' => 'Login exitoso!',
+            'data' => $user_data,
+            'token' => $random_token
         ];
         $this->response($response, RestController::HTTP_OK);
     }
