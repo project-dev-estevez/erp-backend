@@ -33,91 +33,9 @@ class Warehouse_model extends CI_Model {
 		return  $result;
 	}
 
-	//Traspasa material de un brazo a otro
-	public function transfer_arm() {
-
-		$segmento = $this->input->post('segmento');
-		$queryalmacen = $this->db->query("SELECT idtbl_almacenes, uid FROM tbl_almacenes WHERE tbl_segmentos_proyecto_idtbl_segmentos_proyecto = $segmento");
-				
-		foreach($this->input->post('iddtl_solicitud_material') AS $key => $value){
-            if ($this->input->post('cantidad_justificacion')[$key] > 0) {
-                $this->db->set('cantidad', 'cantidad - ' . $this->input->post('cantidad_justificacion')[$key], false);
-				$this->db->set('entregado', 'entregado - ' . $this->input->post('cantidad_justificacion')[$key], false);
-				$this->db->where('iddtl_solicitud_material', $this->input->post('iddtl_solicitud_material')[$key]);
-				$this->db->update('dtl_solicitud_material');
-
-				$this->db->set('cantidad', 'cantidad - ' . $this->input->post('cantidad_justificacion')[$key], false);
-				$this->db->where('iddtl_asignacion', $this->input->post('iddtl_asignacion')[$key]);
-				$this->db->update('dtl_asignacion');
-            }
-		}
-		
-		$data = array(
-			'estatus_solicitud' => 'S',
-			'fecha_creacion' => date('Y-m-d H:i:s'),
-			'uid' => uniqid(),
-			'tbl_usuarios_idtbl_usuarios' => $this->session->userdata('id_usuario'),
-			'tbl_users_idtbl_users_autor' => $this->session->userdata('id'),
-			'tbl_proyectos_idtbl_proyectos' => $this->input->post('proyecto'),
-			'tbl_segmentos_proyecto_idtbl_segmentos_proyecto' => $this->input->post('segmento'),
-			'tbl_usuarios_idtbl_usuarios_supervisor' => $this->session->userdata('id_usuario'),
-			'uid_almacen_seleccionado' => $queryalmacen->result()[0]->uid,
-			'fecha_modificacion' => date('Y-m-d H:i:s'),
-			'tipo_producto' => 'Almacen General',
-			'tbl_mantenimientos_idtbl_mantenimientos' => $this->input->post('brazo_destino')
-		);
-		$this->db->insert('tbl_solicitud_material', $data);
-		$insert_id = $this->db->insert_id();
-
-		foreach($this->input->post('iddtl_solicitud_material') AS $key => $value){
-            if ($this->input->post('cantidad_justificacion')[$key] > 0) {
-                $data_dtl = array(
-					'cantidad' => $this->input->post('cantidad_justificacion')[$key],
-					'tbl_solicitud_material_idtbl_solicitud_material' => $insert_id,
-					'tbl_catalogo_idtbl_catalogo' => $this->input->post('producto')[$key],
-					'entregado' => $this->input->post('cantidad_justificacion')[$key]
-				);
-				$this->db->insert('dtl_solicitud_material', $data_dtl);
-            }
-		}
-
-		$querysalida = $this->db->query("SELECT COUNT(idtbl_almacen_movimientos) as total FROM `tbl_almacen_movimientos` WHERE `tipo` = 'salida-almacen'");
-
-		$data_almacen = array(
-			'fecha' => date('Y-m-d H:i:s'),
-			'tbl_almacenes_idtbl_almacenes' => $queryalmacen->result()[0]->idtbl_almacenes,
-			'uid' => uniqid(),
-			'tipo' => 'salida-almacen',
-			'tbl_usuarios_idtbl_usuarios' => $this->session->userdata('id_usuario'),
-			'estatus' => 1,
-			'tbl_users_idtbl_users' => $this->session->userdata('id'),
-			'folio' => $querysalida->result()[0]->total + 1,
-			'tbl_proyectos_idtbl_proyectos' => $this->input->post('proyecto'),
-			'tbl_segmentos_proyecto_idtbl_segmentos_proyecto' => $this->input->post('segmento'),
-			'parent' => $insert_id,
-			'movimiento_virtual' => 0			
-		);
-
-		$result = $this->db->insert('tbl_almacen_movimientos', $data_almacen);
-		$insert_id_almacen = $this->db->insert_id();
-
-		$idtbl_almacenes = $queryalmacen->result()[0]->idtbl_almacenes;
-		foreach($this->input->post('iddtl_solicitud_material') AS $key => $value){
-            if ($this->input->post('cantidad_justificacion')[$key] > 0) {
-				$idtbl_catalogo = $this->input->post('producto')[$key];
-				$querydtl = $this->db->query("SELECT iddtl_almacen FROM dtl_almacen WHERE tbl_almacenes_idtbl_almacenes = $idtbl_almacenes AND tbl_catalogo_idtbl_catalogo = $idtbl_catalogo AND estatus = 'almacen'");
-                $data_dtl = array(
-					'fecha_asignacion' => date('Y-m-d H:i:s'),
-					'dtl_almacen_iddtl_almacen' => $querydtl->result()[0]->iddtl_almacen,
-					'tbl_usuarios_idtbl_usuarios' => $this->session->userdata('id_usuario'),
-					'tbl_almacen_movimientos_idtbl_almacen_movimientos' => $insert_id_almacen,
-					'cantidad' => $this->input->post('cantidad_justificacion')[$key]
-				);
-				$this->db->insert('dtl_asignacion', $data_dtl);
-            }
-		}
-		
-		return  $result;
+	public function get_general_entries($id_general_wirehouse, $search_term = '') {
+		$query = $this->db->query("SELECT tam.idtbl_almacen_movimientos, tam.uid, tam.fecha, ctd.tipo_documento, tam.numero_documento, tu.nombre, tam.folio, tp.nombre_proyecto, tp.numero_proyecto, tped.neodata_pedido, tped.tbl_proveedores_idtbl_proveedores, tpro.nombre_fiscal, dam.cantidad, dam.precio, tc.descripcion FROM tbl_almacen_movimientos tam LEFT JOIN ctl_tipo_documento ctd ON ctd.idctl_tipo_documento = tam.ctl_tipo_documento_idctl_tipo_documento LEFT JOIN tbl_users tu ON tu.idtbl_users = tam.tbl_users_idtbl_users LEFT JOIN tbl_proyectos tp ON tp.idtbl_proyectos = tam.tbl_proyectos_idtbl_proyectos LEFT JOIN dtl_almacen_movimientos dam ON dam.tbl_almacen_movimientos_idtbl_almacen_movimientos = tam.idtbl_almacen_movimientos LEFT JOIN tbl_catalogo tc ON tc.idtbl_catalogo = dam.tbl_catalogo_idtbl_catalogo LEFT JOIN tbl_pedidos tped ON tped.idtbl_pedidos = tam.parent LEFT JOIN tbl_proveedores tpro ON tpro.idtbl_proveedores = tped.tbl_proveedores_idtbl_proveedores WHERE tam.tbl_almacenes_idtbl_almacenes = $id_general_wirehouse AND tam.tipo = 'entrada-almacen' AND (tam.uid LIKE '$search_term%' OR tam.folio LIKE '$search_term%' OR tam.fecha LIKE '$search_term%' OR tu.nombre LIKE '$search_term%' OR tped.neodata_pedido LIKE '%$search_term%' OR tpro.nombre_fiscal LIKE '%$search_term%' OR tp.nombre_proyecto LIKE '$search_term%' OR ctd.tipo_documento LIKE '$search_term%') GROUP BY tam.uid ORDER BY tam.folio DESC");
+		return $query->result();
 	}
 
 

@@ -54,4 +54,25 @@ class WarehouseController extends RestController{
         $this->response($response, RestController::HTTP_OK);
     }
 
+    public function general_entries_get(){
+
+        $query_params = $this->input->get();
+
+        //***********VALIDATION***********VALIDATION***********
+        // TODO
+        //-----------VALIDATION-----------VALIDATION-----------
+
+        $search_term = $query_params['search_term'];
+
+        $list_of_items = $this->warehouse_model->get_general_entries(ID_ALMACEN_GENERAL, $search_term );
+        $total_items = count( $list_of_items );
+
+        $response = [
+            'list_of_items' => $list_of_items,
+            'total_items' => $total_items
+        ];
+
+        $this->response($response, RestController::HTTP_OK);
+    }
+
 }

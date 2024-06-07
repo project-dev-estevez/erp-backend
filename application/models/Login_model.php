@@ -27,11 +27,34 @@ class Login_model extends CI_Model {
     public function get_user_by_username($username) {
         $this->db->where('username',$username);
         $query = $this->db->get('tbl_users');
-        if($query->num_rows() == 1) {
-            return $query->row();
-        } else {
+
+        if($query->num_rows() != 1){
             return false;
         }
+
+        return $query->row();
+    }
+
+    public function check_user_token( $token ) {
+        $this->db->where('my_key',$token);
+        $query = $this->db->get('api_keys');
+        if($query->num_rows() != 1) {
+            return false;
+        }
+
+        $token_data = $query->row();
+        $date_created = $token_data->date_created;
+
+        $created_date = new DateTime($date_created);
+        $currentDate = new DateTime();
+        $interval = date_diff($currentDate, $created_date);
+
+        // Verifica si han pasado más de 30 días
+        if ($interval->days < 30) {
+            return true;
+        }
+
+        return false;
     }
 
     public function generate_random_token($length = 20) {

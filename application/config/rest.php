@@ -180,6 +180,7 @@ $config['auth_library_function'] = '';
 |
 */
 $config['auth_override_class_method']['api/AuthenticationController']['login_post'] = 'none';
+$config['auth_override_class_method']['api/AuthenticationController']['check_token_get'] = 'none';
 // $config['auth_override_class_method']['deals']['view'] = 'none';
 // $config['auth_override_class_method']['deals']['insert'] = 'digest';
 // $config['auth_override_class_method']['accounts']['user'] = 'basic';

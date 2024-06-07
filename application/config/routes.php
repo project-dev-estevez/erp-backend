@@ -55,13 +55,11 @@ $route['translate_uri_dashes'] = FALSE;
 
 // ******************* AUTENTICACIÓN ***************************** //
 $route['api/auth/login'] = 'api/AuthenticationController/login';
+$route['api/auth/check-token/(:any)'] = 'api/AuthenticationController/check_token/$1';
 // ******************* AUTENTICACIÓN ***************************** //
 
 
 // ******************* ALMACEN ***************************** //
-//$route['almacen/activar-almacen']='almacen/activar_almacen'; // *** Migrado
-//$route['almacen/desactivar-almacen']='almacen/desactivar_almacen'; // *** Migrado
 $route['api/warehouse/activate-or-desactivate/(:any)'] = 'Api/WarehouseController/activate_or_desactivate/$1';
-// DETALLE DEL ALMACEN
-// $route['almacen/traspaso-brazo']='almacen/traspaso_brazo'; // *** No es necesario
+$route['api/warehouse/general-entries'] = 'Api/WarehouseController/general_entries';
 // ******************* ALMACEN ***************************** //

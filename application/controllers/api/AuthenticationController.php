@@ -46,13 +46,14 @@ class AuthenticationController extends RestController
 
         // Si la contraseña es correcta.
         $user_data = $validation['user_data'];
+        unset($user_data->password);
 
         // 1. generar un token y cifrarlo con PHP
         $random_token = $this->login_model->generate_random_token();
         // $token_hash = password_hash( $random_token, PASSWORD_DEFAULT ); --> Refinar Con Esto
 
         // 2. en el modelo de login, crear función para cear registros en la tabla api_keys.
-        $is_logued = $this->login_model->login( $user_data->id, $random_token, 1 );
+        $is_logued = $this->login_model->login( $user_data->idtbl_users, $random_token, 1 );
 
         log_message('info', "[Estevez] " . $user_data->nombre . " - " . "Inició Sesión!");
         $response = [
@@ -61,6 +62,28 @@ class AuthenticationController extends RestController
             'data' => $user_data,
             'token' => $random_token
         ];
+        $this->response($response, RestController::HTTP_OK);
+    }
+
+    public function check_token_get( $token )
+    {
+        $is_ok_token = $this->login_model->check_user_token( $token );
+
+        if( !$is_ok_token ){
+            $response = [
+                'error' => true,
+                'message' => 'Token Inválido o Expiró!'
+            ];
+
+            $this->response($response, RestController::HTTP_UNAUTHORIZED);
+        }
+
+        $response = [
+            'status' => true,
+            'message' => 'Token Valido!',
+            'token' => $token
+        ];
+
         $this->response($response, RestController::HTTP_OK);
     }
 
