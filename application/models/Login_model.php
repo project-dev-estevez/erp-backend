@@ -24,6 +24,12 @@ class Login_model extends CI_Model {
         return $this->db->insert_id();
     }
 
+    public function logout( $api_key ) {
+        // Delete the API key from the database
+        $this->db->where('my_key', $api_key);
+        return $this->db->delete('api_keys');
+    }
+
     public function get_user_by_username($username) {
         $this->db->where('username',$username);
         $query = $this->db->get('tbl_users');
@@ -50,11 +56,14 @@ class Login_model extends CI_Model {
         $interval = date_diff($currentDate, $created_date);
 
         // Verifica si han pasado más de 30 días
-        if ($interval->days < 30) {
-            return true;
+        if ($interval->days > 30) {
+            // Elimina el token de la base de datos
+            $this->db->where('my_key', $token);
+            $this->db->delete('api_keys');
+            return false;
         }
 
-        return false;
+        return true;
     }
 
     public function generate_random_token($length = 20) {

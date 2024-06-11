@@ -65,6 +65,31 @@ class AuthenticationController extends RestController
         $this->response($response, RestController::HTTP_OK);
     }
 
+    public function logout_post() {
+        $api_key = $this->input->get_request_header('X-API-KEY', TRUE);
+
+        if (empty($api_key)) {
+            $this->response([
+                'status' => FALSE,
+                'message' => 'API key is missing'
+            ], RestController::HTTP_BAD_REQUEST);
+        }
+
+        $deleted = $this->login_model->logout( $api_key );
+
+        if ($deleted) {
+            $this->response([
+                'status' => TRUE,
+                'message' => 'Logout successful'
+            ], RestController::HTTP_OK);
+        } 
+
+        $this->response([
+            'status' => FALSE,
+            'message' => 'DB Error: No se pudo cerrar sesión!'
+        ], RestController::HTTP_BAD_REQUEST);
+    }
+
     public function check_token_get( $token )
     {
         $is_ok_token = $this->login_model->check_user_token( $token );

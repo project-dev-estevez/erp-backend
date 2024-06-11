@@ -55,6 +55,7 @@ $route['translate_uri_dashes'] = FALSE;
 
 // ******************* AUTENTICACIÓN ***************************** //
 $route['api/auth/login'] = 'api/AuthenticationController/login';
+$route['api/auth/logout'] = 'api/AuthenticationController/logout';
 $route['api/auth/check-token/(:any)'] = 'api/AuthenticationController/check_token/$1';
 // ******************* AUTENTICACIÓN ***************************** //
 
