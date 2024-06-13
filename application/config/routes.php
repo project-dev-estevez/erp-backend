@@ -63,4 +63,6 @@ $route['api/auth/check-token/(:any)'] = 'api/AuthenticationController/check_toke
 // ******************* ALMACEN ***************************** //
 $route['api/warehouse/activate-or-desactivate/(:any)'] = 'Api/WarehouseController/activate_or_desactivate/$1';
 $route['api/warehouse/general-entries'] = 'Api/WarehouseController/general_entries';
+$route['api/warehouse/general-exits'] = 'Api/WarehouseController/general_exits';
+
 // ******************* ALMACEN ***************************** //

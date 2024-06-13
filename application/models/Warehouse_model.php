@@ -38,6 +38,11 @@ class Warehouse_model extends CI_Model {
 		return $query->result();
 	}
 
+	public function get_general_exits($id_general_wirehouse, $search_term = '') {
+		$query = $this->db->query("SELECT tam.idtbl_almacen_movimientos, tam.uid, tam.fecha, tam.numero_documento, tu.nombre, tam.folio, tp.nombre_proyecto, tp.numero_proyecto, cae.nombre AS nombre_entrega, CONCAT(tus.nombres,' ',tus.apellido_paterno,' ',tus.apellido_materno) AS nombre_recibe FROM tbl_almacen_movimientos tam LEFT JOIN tbl_users tu ON tu.idtbl_users = tam.tbl_users_idtbl_users LEFT JOIN ctl_autorizados_entrega cae ON cae.idctl_autorizados_entrega = tam.ctl_autorizados_entrega_idctl_autorizados_entrega LEFT JOIN tbl_usuarios tus ON tus.idtbl_usuarios = tam.tbl_usuarios_idtbl_usuarios LEFT JOIN tbl_solicitud_material tsm ON tsm.idtbl_solicitud_material = tam.parent LEFT JOIN tbl_proyectos tp ON tp.idtbl_proyectos = tsm.tbl_proyectos_idtbl_proyectos WHERE tam.tbl_almacenes_idtbl_almacenes = $id_general_wirehouse AND tam.tipo = 'salida-almacen' AND (tam.uid LIKE '$search_term%' OR tam.folio LIKE '$search_term%' OR tam.fecha LIKE '$search_term%' OR tu.nombre LIKE '$search_term%' OR tp.nombre_proyecto LIKE '$search_term%') GROUP BY tam.uid ORDER BY tam.folio DESC");
+		return $query->result();
+	}
+
 
 
     
